@@ -1,5 +1,5 @@
 import React from 'react';
-import { Scale, ArrowRight, CheckCircle2, Shield, RefreshCw } from 'lucide-react';
+import { Scale, ArrowRight, Shield, RefreshCw } from 'lucide-react';
 
 export default function RebalanceMonitor({ rebalanceStatus, onTriggerRebalance, isRebalancing }) {
   const isBalanced = rebalanceStatus?.is_balanced ?? true;
@@ -8,13 +8,13 @@ export default function RebalanceMonitor({ rebalanceStatus, onTriggerRebalance, 
   const moves = rebalanceStatus?.recommended_moves || [];
 
   return (
-    <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
+    <section aria-labelledby="rebalance-heading" className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Scale className="w-5 h-5 text-indigo-400" />
+          <Scale className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           <div>
-            <h2 className="text-base font-semibold text-white m-0">Cluster Storage Rebalancing</h2>
+            <h2 id="rebalance-heading" className="text-base font-semibold text-white m-0">Cluster Storage Rebalancing</h2>
             <p className="text-xs text-slate-400 m-0">
               Capacity skew minimization and non-destructive replica migration
             </p>
@@ -22,15 +22,23 @@ export default function RebalanceMonitor({ rebalanceStatus, onTriggerRebalance, 
         </div>
 
         <button
+          type="button"
           onClick={onTriggerRebalance}
           disabled={isRebalancing || isBalanced}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-md transition-all ${
+          aria-label={
+            isRebalancing 
+              ? "Rebalancing cluster storage across nodes" 
+              : isBalanced 
+              ? "Cluster storage is currently balanced" 
+              : "Execute cluster storage rebalance"
+          }
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
             isBalanced
               ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
               : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-900/30'
           }`}
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isRebalancing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${isRebalancing ? 'animate-spin' : ''}`} aria-hidden="true" />
           {isRebalancing ? 'Rebalancing Cluster...' : 'Execute Rebalance'}
         </button>
       </div>
@@ -62,7 +70,7 @@ export default function RebalanceMonitor({ rebalanceStatus, onTriggerRebalance, 
         <div className="glass-card p-3 rounded-xl border border-slate-800">
           <span className="text-[11px] text-slate-400">Safe Rule Guarantee</span>
           <p className="text-xs text-slate-300 m-0 mt-1 flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+            <Shield className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" aria-hidden="true" />
             Delete source only after target is verified
           </p>
         </div>
@@ -78,13 +86,20 @@ export default function RebalanceMonitor({ rebalanceStatus, onTriggerRebalance, 
                 <span className="font-mono text-slate-300">{nodeId}</span>
                 <span className="font-mono text-white font-semibold">{pct}%</span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div 
+                role="progressbar"
+                aria-valuenow={pct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Storage utilization for ${nodeId}: ${pct}%`}
+                className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden"
+              >
                 <div
-                  className={`h-1.5 rounded-full ${
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
                     pct > 70 ? 'bg-amber-400' : 'bg-indigo-400'
                   }`}
                   style={{ width: `${Math.max(3, pct)}%` }}
-                ></div>
+                />
               </div>
             </div>
           ))}
@@ -110,7 +125,7 @@ export default function RebalanceMonitor({ rebalanceStatus, onTriggerRebalance, 
                   <span className="px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-800/40 text-amber-300">
                     {move.source_node_id} (Overloaded)
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
                   <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-300">
                     {move.target_node_id} (Underutilized)
                   </span>
@@ -120,6 +135,6 @@ export default function RebalanceMonitor({ rebalanceStatus, onTriggerRebalance, 
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

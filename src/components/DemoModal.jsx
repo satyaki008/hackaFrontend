@@ -1,23 +1,40 @@
-import React from 'react';
-import { X, CheckCircle2, Clock, AlertTriangle, Play, Sparkles, Server, ShieldCheck, ArrowRight } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { X, CheckCircle2, Clock, AlertTriangle, Sparkles } from 'lucide-react';
 
 export default function DemoModal({ isOpen, onClose, demoType, timeline, isRunning, result }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const isAutoRepair = demoType === 'auto-repair';
   const title = isAutoRepair ? '10-Step Distributed Node Failure & Auto-Healing Demo' : 'Data Corruption Detection & Peer Self-Healing Demo';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div 
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="demo-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
+    >
       <div className="glass-panel w-full max-w-2xl rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white m-0">{title}</h3>
+              <h3 id="demo-modal-title" className="text-sm font-bold text-white m-0">{title}</h3>
               <p className="text-xs text-slate-400 m-0">
                 Automated live simulation of real distributed fault recovery
               </p>
@@ -25,18 +42,24 @@ export default function DemoModal({ isOpen, onClose, demoType, timeline, isRunni
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            aria-label="Close simulation dialog"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
         {/* Content Body: Timeline */}
         <div className="p-5 overflow-y-auto space-y-4 flex-1">
           {isRunning && (
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs animate-pulse">
-              <Clock className="w-4 h-4 animate-spin" />
+            <div 
+              role="status"
+              aria-live="polite"
+              className="flex items-center gap-3 p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs animate-pulse"
+            >
+              <Clock className="w-4 h-4 animate-spin" aria-hidden="true" />
               Executing real distributed operations on storage nodes in real time...
             </div>
           )}
@@ -57,6 +80,7 @@ export default function DemoModal({ isOpen, onClose, demoType, timeline, isRunni
                         ? 'bg-rose-500 border-rose-400 text-white'
                         : 'bg-amber-400 border-amber-300 text-slate-950 animate-ping'
                     }`}
+                    aria-hidden="true"
                   >
                     {isCompleted && <CheckCircle2 className="w-2.5 h-2.5 stroke-[3]" />}
                   </span>
@@ -99,13 +123,15 @@ export default function DemoModal({ isOpen, onClose, demoType, timeline, isRunni
 
           {result && (
             <div
+              role="status"
+              aria-live="polite"
               className={`p-3 rounded-xl border text-xs font-medium flex items-center gap-2 ${
                 result.success
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                   : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
               }`}
             >
-              {result.success ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+              {result.success ? <CheckCircle2 className="w-4 h-4" aria-hidden="true" /> : <AlertTriangle className="w-4 h-4" aria-hidden="true" />}
               {result.success
                 ? 'Simulation successfully verified! Full fault tolerance, data repair, and checksum integrity confirmed.'
                 : 'Simulation encountered an error. Check cluster logs.'}
@@ -116,8 +142,10 @@ export default function DemoModal({ isOpen, onClose, demoType, timeline, isRunni
         {/* Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-900/60 flex items-center justify-end">
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-white transition-colors"
+            aria-label="Close demo modal"
+            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-white transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500"
           >
             Close
           </button>

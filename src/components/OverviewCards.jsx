@@ -54,20 +54,27 @@ export default function OverviewCards({ stats, nodes = [] }) {
             </div>
             
             {/* Progress bar */}
-            <div className="w-full bg-[#0B0F17] rounded-full h-1.5 mt-3 overflow-hidden border border-[#1E2736]">
+            <div 
+              role="progressbar"
+              aria-valuenow={parseFloat(usedPercentage) || 0}
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-label="Storage capacity utilization"
+              className="w-full bg-[#0B0F17] rounded-full h-1.5 mt-3 overflow-hidden border border-[#1E2736]"
+            >
               <div 
                 className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-500" 
                 style={{ width: `${Math.max(3, parseFloat(usedPercentage))}%` }} 
               />
             </div>
-            <div className="flex justify-between items-center text-[10px] font-mono text-slate-500 mt-1">
+            <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 mt-1">
               <span>{usedPercentage}% Used</span>
               <span>{formatBytes(Math.max(0, total_storage_bytes - used_storage_bytes))} Free</span>
             </div>
           </div>
 
           <div className="p-2.5 rounded-xl text-cyan-400 bg-cyan-400/10 border border-cyan-400/20 ml-3">
-            <HardDrive size={20} />
+            <HardDrive size={20} aria-hidden="true" />
           </div>
         </div>
       </div>
@@ -104,14 +111,14 @@ export default function OverviewCards({ stats, nodes = [] }) {
                 );
               })}
             </div>
-            <div className="flex justify-between items-center text-[10px] font-mono text-slate-500 mt-1">
+            <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 mt-1">
               <span className="text-emerald-400 font-medium">{cloudNodesCount} Atlas Live</span>
               <span>{Math.max(0, total_nodes - cloudNodesCount)} Standby</span>
             </div>
           </div>
 
           <div className="p-2.5 rounded-xl text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 ml-3">
-            <Server size={20} />
+            <Server size={20} aria-hidden="true" />
           </div>
         </div>
       </div>
@@ -136,13 +143,13 @@ export default function OverviewCards({ stats, nodes = [] }) {
                 RS(4+2)
               </span>
             </div>
-            <div className="text-[10px] font-mono text-slate-500 mt-1.5">
+            <div className="text-[10px] font-mono text-slate-400 mt-1.5">
               {total_replicas} verified replicas stored
             </div>
           </div>
 
           <div className="p-2.5 rounded-xl text-indigo-400 bg-indigo-400/10 border border-indigo-400/20 ml-3">
-            <Copy size={20} />
+            <Copy size={20} aria-hidden="true" />
           </div>
         </div>
       </div>
@@ -166,10 +173,10 @@ export default function OverviewCards({ stats, nodes = [] }) {
             </div>
 
             <div className="mt-3 flex items-center gap-1 text-[11px] font-mono text-slate-400">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
               <span>Bit-Rot & Loss Protected</span>
             </div>
-            <div className="text-[10px] font-mono text-slate-500 mt-1">
+            <div className="text-[10px] font-mono text-slate-400 mt-1">
               Merkle Tree Continuous Hash Audit
             </div>
           </div>
@@ -179,7 +186,7 @@ export default function OverviewCards({ stats, nodes = [] }) {
               ? 'text-amber-400 bg-amber-400/10 border-amber-400/20 animate-spin' 
               : 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
           }`}>
-            <Zap size={20} />
+            <Zap size={20} aria-hidden="true" />
           </div>
         </div>
       </div>

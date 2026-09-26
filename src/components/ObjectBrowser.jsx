@@ -68,13 +68,14 @@ export default function ObjectBrowser({
 
         {/* Search */}
         <div className="relative w-full md:w-64">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
           <input
             type="text"
             placeholder="Search files..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/80 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+            aria-label="Search stored objects by filename"
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/80 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
           />
         </div>
       </div>
@@ -87,12 +88,13 @@ export default function ObjectBrowser({
           onChange={handleFileSelect}
           className="hidden"
           id="object-file-picker"
+          aria-label="Select file to upload to distributed cluster"
         />
         <label
           htmlFor="object-file-picker"
-          className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:border-slate-600 text-xs font-medium text-slate-200 transition-colors"
+          className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:border-slate-600 text-xs font-medium text-slate-200 transition-colors focus-within:ring-2 focus-within:ring-cyan-500"
         >
-          <Upload className="w-3.5 h-3.5 text-cyan-400" />
+          <Upload className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />
           {selectedFile ? selectedFile.name : 'Choose File to Upload'}
         </label>
 
@@ -103,10 +105,12 @@ export default function ObjectBrowser({
         )}
 
         <div className="flex items-center gap-2 ml-auto">
-          <label className="text-xs text-slate-400">Replicas:</label>
+          <label htmlFor="replica-factor-select" className="text-xs text-slate-300">Replicas:</label>
           <select
+            id="replica-factor-select"
             value={replicationFactor}
             onChange={(e) => setReplicationFactor(Number(e.target.value))}
+            aria-label="Select replication redundancy level"
             className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-cyan-500"
           >
             <option value={1}>1x (No redundancy)</option>
@@ -118,16 +122,17 @@ export default function ObjectBrowser({
           <button
             type="submit"
             disabled={!selectedFile || isUploading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md shadow-cyan-900/30 transition-all disabled:opacity-50"
+            aria-label={isUploading ? "Uploading and replicating file across nodes" : "Upload file and write replicas"}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md shadow-cyan-900/30 transition-all disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cyan-400"
           >
             {isUploading ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
                 Replicating...
               </>
             ) : (
               <>
-                <Upload className="w-3.5 h-3.5" />
+                <Upload className="w-3.5 h-3.5" aria-hidden="true" />
                 Upload & Replicate
               </>
             )}
@@ -180,15 +185,17 @@ export default function ObjectBrowser({
                   {/* ID */}
                   <td className="py-2.5 px-3 font-mono text-slate-400">
                     <button
+                      type="button"
                       onClick={() => copyToClipboard(obj.id, `id-${obj.id}`)}
-                      className="hover:text-white flex items-center gap-1 transition-colors"
+                      aria-label={`Copy full object ID for ${obj.name}`}
+                      className="hover:text-white flex items-center gap-1 transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500 rounded"
                       title="Click to copy full UUID"
                     >
                       {obj.id.slice(0, 8)}...
                       {copiedId === `id-${obj.id}` ? (
-                        <Check className="w-3 h-3 text-emerald-400" />
+                        <Check className="w-3 h-3 text-emerald-400" aria-hidden="true" />
                       ) : (
-                        <Copy className="w-3 h-3 opacity-50" />
+                        <Copy className="w-3 h-3 opacity-50" aria-hidden="true" />
                       )}
                     </button>
                   </td>
@@ -206,15 +213,17 @@ export default function ObjectBrowser({
                   {/* SHA-256 */}
                   <td className="py-2.5 px-3 font-mono text-slate-400">
                     <button
+                      type="button"
                       onClick={() => copyToClipboard(obj.checksum, `sha-${obj.id}`)}
-                      className="hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                      aria-label={`Copy full SHA-256 hash for ${obj.name}`}
+                      className="hover:text-cyan-300 flex items-center gap-1 transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500 rounded"
                       title="Click to copy full SHA-256"
                     >
                       {obj.checksum.slice(0, 10)}...
                       {copiedId === `sha-${obj.id}` ? (
-                        <Check className="w-3 h-3 text-emerald-400" />
+                        <Check className="w-3 h-3 text-emerald-400" aria-hidden="true" />
                       ) : (
-                        <Copy className="w-3 h-3 opacity-50" />
+                        <Copy className="w-3 h-3 opacity-50" aria-hidden="true" />
                       )}
                     </button>
                   </td>
@@ -264,25 +273,31 @@ export default function ObjectBrowser({
                   <td className="py-2.5 px-3 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button
+                        type="button"
                         onClick={() => onDownload(obj.id, obj.name)}
-                        className="p-1.5 rounded-md hover:bg-slate-800 text-slate-300 hover:text-white transition-colors"
+                        aria-label={`Download ${obj.name}`}
+                        className="p-1.5 rounded-md hover:bg-slate-800 text-slate-300 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500"
                         title="Download object (with automatic failover)"
                       >
-                        <Download className="w-3.5 h-3.5" />
+                        <Download className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                       <button
+                        type="button"
                         onClick={() => onCorruptReplica(obj.id)}
-                        className="p-1.5 rounded-md hover:bg-amber-950/30 text-amber-400/80 hover:text-amber-300 transition-colors"
+                        aria-label={`Inject byte corruption into replica of ${obj.name}`}
+                        className="p-1.5 rounded-md hover:bg-amber-950/30 text-amber-400/80 hover:text-amber-300 transition-colors focus:outline-none focus:ring-1 focus:ring-amber-500"
                         title="Inject byte corruption on disk for testing self-healing"
                       >
-                        <Bug className="w-3.5 h-3.5" />
+                        <Bug className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                       <button
+                        type="button"
                         onClick={() => onDelete(obj.id)}
-                        className="p-1.5 rounded-md hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 transition-colors"
+                        aria-label={`Delete ${obj.name} and all replicas`}
+                        className="p-1.5 rounded-md hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 transition-colors focus:outline-none focus:ring-1 focus:ring-rose-500"
                         title="Delete object and all replicas"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                     </div>
                   </td>

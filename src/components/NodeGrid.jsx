@@ -38,6 +38,18 @@ export default function NodeGrid({
   const [mongoUri, setMongoUri] = useState('');
   const [configuring, setConfiguring] = useState(false);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && cloudModalOpen) {
+        handleCloseModal();
+      }
+    };
+    if (cloudModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [cloudModalOpen]);
+
   const handleOpenCloudModal = (nodeId) => {
     setSelectedNode(nodeId);
     setCloudModalOpen(true);
@@ -75,16 +87,16 @@ export default function NodeGrid({
   };
 
   return (
-    <div className="space-y-4">
+    <section aria-labelledby="nodes-heading" className="space-y-4">
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Server className="w-4 h-4 text-cyan-400" />
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono m-0">
+          <Server className="w-4 h-4 text-cyan-400" aria-hidden="true" />
+          <h3 id="nodes-heading" className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono m-0">
             Physical & Cloud Storage Blades (4 Dispersal Nodes)
           </h3>
         </div>
-        <div className="text-[11px] font-mono text-slate-500">
+        <div className="text-[11px] font-mono text-slate-400">
           Independent Failure Domains &bull; Quorum Threshold: W &ge; 2
         </div>
       </div>
@@ -127,6 +139,7 @@ export default function NodeGrid({
                     ? 'bg-gradient-to-r from-cyan-400 to-emerald-400'
                     : 'bg-gradient-to-r from-amber-500/60 to-slate-700'
                 }`}
+                aria-hidden="true"
               />
 
               <div>
@@ -140,19 +153,19 @@ export default function NodeGrid({
                         ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.15)]' 
                         : 'bg-slate-800 border-slate-700 text-slate-400'
                     }`}>
-                      {isAtlas ? <Cloud size={18} /> : <Server size={18} />}
+                      {isAtlas ? <Cloud size={18} aria-hidden="true" /> : <Server size={18} aria-hidden="true" />}
                     </div>
                     <div>
                       <h4 className="font-bold text-white uppercase tracking-wider text-sm font-mono m-0 flex items-center gap-1.5">
                         {node.id}
                         {isAtlas && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
                         )}
                       </h4>
                       <div className="flex items-center gap-1.5 mt-1">
                         {isAtlas ? (
                           <span className="text-[9px] font-bold font-mono bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30 flex items-center gap-1">
-                            <Globe size={10} /> ATLAS CLOUD
+                            <Globe size={10} aria-hidden="true" /> ATLAS CLOUD
                           </span>
                         ) : (
                           <span className="text-[9px] font-bold font-mono bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
@@ -167,7 +180,7 @@ export default function NodeGrid({
                   <div className={`text-[10px] font-bold px-2 py-1 rounded-full border flex items-center gap-1.5 font-mono ${getStatusColor(node.status, isAtlas)}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${
                       isOffline ? 'bg-rose-400' : !isAtlas ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'
-                    }`} />
+                    }`} aria-hidden="true" />
                     {statusText}
                   </div>
                 </div>
@@ -175,7 +188,7 @@ export default function NodeGrid({
                 {/* Cloud Cluster Snippet */}
                 {isAtlas && (
                   <div className="mb-3 px-2.5 py-1.5 rounded-lg bg-[#0B0F17] border border-[#1E2736] text-[10px] font-mono text-cyan-300/80 flex items-center justify-between">
-                    <span className="text-slate-500">URI:</span>
+                    <span className="text-slate-400">URI:</span>
                     <span className="truncate max-w-[170px]" title="cluster0.i7avjwe.mongodb.net">
                       cluster0.i7avjwe.mongodb.net
                     </span>
@@ -185,10 +198,12 @@ export default function NodeGrid({
                 {/* Connect Cloud Button for Standby Nodes */}
                 {!isAtlas && (
                   <button
+                    type="button"
                     onClick={() => handleOpenCloudModal(node.id)}
-                    className="mb-3 w-full flex items-center justify-center gap-1.5 py-1.5 border border-dashed border-amber-500/30 rounded-lg text-xs font-mono text-amber-400/90 hover:text-cyan-400 hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all cursor-pointer"
+                    aria-label={`Connect MongoDB Atlas to ${node.id}`}
+                    className="mb-3 w-full flex items-center justify-center gap-1.5 py-1.5 border border-dashed border-amber-500/30 rounded-lg text-xs font-mono text-amber-400/90 hover:text-cyan-400 hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400"
                   >
-                    <Plus size={14} /> Connect MongoDB Atlas
+                    <Plus size={14} aria-hidden="true" /> Connect MongoDB Atlas
                   </button>
                 )}
 
@@ -196,15 +211,15 @@ export default function NodeGrid({
                 <div className="grid grid-cols-2 gap-2 mb-4 bg-[#0B0F17] p-3 rounded-lg border border-[#1E2736]">
                   {/* Latency with Sparkline */}
                   <div className="flex flex-col justify-between">
-                    <span className="text-[10px] text-slate-500 uppercase font-mono flex items-center gap-1">
-                      <Activity size={10} className="text-cyan-400" /> Latency
+                    <span className="text-[10px] text-slate-400 uppercase font-mono flex items-center gap-1">
+                      <Activity size={10} className="text-cyan-400" aria-hidden="true" /> Latency
                     </span>
                     <div className="flex items-baseline justify-between mt-1">
                       <span className={`text-sm font-mono font-bold ${hasLatency ? 'text-amber-400' : 'text-slate-200'}`}>
                         {node.response_time_ms ? `${node.response_time_ms}ms` : '<1ms'}
                       </span>
                       {/* Sparkline Bars */}
-                      <div className="flex items-end gap-0.5 h-4 ml-1">
+                      <div className="flex items-end gap-0.5 h-4 ml-1" aria-hidden="true">
                         {[30, 45, 25, 40, hasLatency ? 85 : 35, hasLatency ? 100 : (node.response_time_ms > 10 ? 60 : 30)].map((h, i) => (
                           <div
                             key={i}
@@ -220,14 +235,14 @@ export default function NodeGrid({
 
                   {/* Replicas count */}
                   <div className="flex flex-col justify-between border-l border-[#1E2736] pl-2.5">
-                    <span className="text-[10px] text-slate-500 uppercase font-mono flex items-center gap-1">
-                      <Database size={10} className="text-blue-400" /> Stored
+                    <span className="text-[10px] text-slate-400 uppercase font-mono flex items-center gap-1">
+                      <Database size={10} className="text-blue-400" aria-hidden="true" /> Stored
                     </span>
                     <div className="flex items-baseline gap-1 mt-1">
                       <span className="text-sm font-mono font-bold text-white">
                         {node.object_count || 0}
                       </span>
-                      <span className="text-[10px] text-slate-500 font-mono">shards</span>
+                      <span className="text-[10px] text-slate-400 font-mono">shards</span>
                     </div>
                   </div>
                 </div>
@@ -238,7 +253,14 @@ export default function NodeGrid({
                     <span>Capacity</span>
                     <span>{formatBytes(node.used_capacity_bytes)} / {formatBytes(node.total_capacity_bytes)}</span>
                   </div>
-                  <div className="h-1.5 w-full bg-[#0B0F17] rounded-full overflow-hidden border border-[#1E2736]">
+                  <div 
+                    role="progressbar"
+                    aria-valuenow={Math.round(usedPercent)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Storage capacity used for ${node.id}: ${Math.round(usedPercent)}%`}
+                    className="h-1.5 w-full bg-[#0B0F17] rounded-full overflow-hidden border border-[#1E2736]"
+                  >
                     <div 
                       className={`h-full rounded-full transition-all duration-500 ${
                         usedPercent > 80 
@@ -257,42 +279,50 @@ export default function NodeGrid({
               <div className="flex items-center gap-2 pt-3 border-t border-[#1E2736] mt-auto">
                 {isOffline ? (
                   <button 
+                    type="button"
                     onClick={() => onRecoverNode(node.id)}
-                    className="flex-1 flex justify-center items-center gap-1.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/20 transition-all text-xs font-semibold font-mono cursor-pointer"
+                    aria-label={`Recover blade ${node.id} to online status`}
+                    className="flex-1 flex justify-center items-center gap-1.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/20 transition-all text-xs font-semibold font-mono cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-400"
                   >
-                    <Power size={13} /> Recover
+                    <Power size={13} aria-hidden="true" /> Recover
                   </button>
                 ) : (
                   <button 
+                    type="button"
                     onClick={() => onFailNode(node.id)}
-                    className="flex-1 flex justify-center items-center gap-1.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg border border-rose-500/20 transition-all text-xs font-semibold font-mono cursor-pointer"
+                    aria-label={`Simulate failure on blade ${node.id}`}
+                    className="flex-1 flex justify-center items-center gap-1.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg border border-rose-500/20 transition-all text-xs font-semibold font-mono cursor-pointer focus:outline-none focus:ring-1 focus:ring-rose-400"
                   >
-                    <PowerOff size={13} /> Fail Blade
+                    <PowerOff size={13} aria-hidden="true" /> Fail Blade
                   </button>
                 )}
 
                 <button 
+                  type="button"
                   onClick={() => onSetLatency(node.id, hasLatency ? 0 : 500)}
-                  className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                  aria-label={hasLatency ? `Clear injected latency on ${node.id}` : `Inject 500ms network latency jitter on ${node.id}`}
+                  className={`p-1.5 rounded-lg border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
                     hasLatency 
                       ? 'bg-amber-500/20 border-amber-500/40 text-amber-400' 
                       : 'bg-[#0B0F17] border-[#1E2736] text-slate-400 hover:text-amber-400 hover:border-amber-400/30'
                   }`}
                   title={hasLatency ? "Clear Injected Latency" : "Inject 500ms Latency Jitter"}
                 >
-                  <Clock size={15} />
+                  <Clock size={15} aria-hidden="true" />
                 </button>
 
                 <button 
+                  type="button"
                   onClick={() => onTogglePartition(node.id, 'controller', !isPartitioned)}
-                  className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                  aria-label={isPartitioned ? `Heal network partition on ${node.id}` : `Isolate ${node.id} with network partition simulation`}
+                  className={`p-1.5 rounded-lg border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-rose-400 ${
                     isPartitioned 
                       ? 'bg-rose-500/20 border-rose-500/40 text-rose-400' 
                       : 'bg-[#0B0F17] border-[#1E2736] text-slate-400 hover:text-rose-400 hover:border-rose-400/30'
                   }`}
                   title={isPartitioned ? "Heal Network Partition" : "Isolate Node (Split-Brain Simulation)"}
                 >
-                  <WifiOff size={15} />
+                  <WifiOff size={15} aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -302,20 +332,27 @@ export default function NodeGrid({
 
       {/* Cloud Config Modal */}
       {cloudModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+        <div 
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cloud-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4"
+        >
           <div className="bg-[#161B26] border border-[#1E2736] rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
             <div className="flex justify-between items-center p-5 border-b border-[#1E2736] bg-[#0B0F17]">
               <div className="flex items-center gap-2.5">
-                <Cloud size={20} className="text-cyan-400" />
-                <h3 className="text-base font-bold text-white m-0">
+                <Cloud size={20} className="text-cyan-400" aria-hidden="true" />
+                <h3 id="cloud-modal-title" className="text-base font-bold text-white m-0">
                   Connect {selectedNode?.toUpperCase()} to MongoDB Atlas
                 </h3>
               </div>
               <button 
+                type="button"
                 onClick={handleCloseModal}
-                className="text-slate-400 hover:text-white transition-colors"
+                aria-label="Close dialog"
+                className="text-slate-400 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500 rounded p-1"
               >
-                <X size={20} />
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
             
@@ -339,10 +376,10 @@ export default function NodeGrid({
                   value={mongoUri}
                   onChange={(e) => setMongoUri(e.target.value)}
                   placeholder="mongodb+srv://<user>:<password>@cluster0.mongodb.net/?appName=Cluster0"
-                  className="w-full bg-[#0B0F17] border border-[#1E2736] focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-600 outline-none transition-all font-mono text-xs"
+                  className="w-full bg-[#0B0F17] border border-[#1E2736] focus:border-cyan-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 outline-none transition-all font-mono text-xs"
                   required
                 />
-                <p className="mt-2 text-[11px] text-slate-500">
+                <p className="mt-2 text-[11px] text-slate-400">
                   ResiStore will ping the cluster, authenticate, and register collection <code className="text-cyan-300">{selectedNode}_chunks</code>.
                 </p>
               </div>
@@ -351,22 +388,24 @@ export default function NodeGrid({
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-[#0B0F17] border border-[#1E2736] transition-colors"
+                  aria-label="Cancel configuration"
+                  className="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-[#0B0F17] border border-[#1E2736] transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={configuring || !mongoUri}
-                  className="px-5 py-2 rounded-lg text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white disabled:opacity-50 flex items-center gap-2 transition-all cursor-pointer"
+                  aria-label={configuring ? "Verifying Atlas connection..." : "Attach Atlas Cloud to Node"}
+                  className="px-5 py-2 rounded-lg text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white disabled:opacity-50 flex items-center gap-2 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 >
                   {configuring ? (
                     <>
-                      <Zap size={14} className="animate-spin" /> Verifying Connection...
+                      <Zap size={14} className="animate-spin" aria-hidden="true" /> Verifying Connection...
                     </>
                   ) : (
                     <>
-                      <Cloud size={14} /> Attach Atlas Cloud
+                      <Cloud size={14} aria-hidden="true" /> Attach Atlas Cloud
                     </>
                   )}
                 </button>
@@ -375,6 +414,6 @@ export default function NodeGrid({
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Network, Server, Shield, Cloud, Radio, Activity, Play, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Network, Server, Shield, Cloud, Radio, Zap } from 'lucide-react';
 
 export default function TopologyView({ nodes, stats, repairJobs }) {
   const [isSimulatingTraffic, setIsSimulatingTraffic] = useState(false);
@@ -11,16 +11,16 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
   };
 
   return (
-    <div className="space-y-6">
+    <section aria-labelledby="topology-heading" className="space-y-6">
       {/* ── TOPOLOGY CONTROL BAR ── */}
       <div className="bg-[#161B26] border border-[#1E2736] rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-              <Network className="w-6 h-6" />
+              <Network className="w-6 h-6" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white m-0">Live Distributed Cluster Topology & Data Flow</h2>
+              <h2 id="topology-heading" className="text-base font-bold text-white m-0">Live Distributed Cluster Topology & Data Flow</h2>
               <p className="text-xs text-slate-400 m-0">
                 Multi-tier architecture: Gateway Quorum Controller &bull; MongoDB Atlas Cloud Tier &bull; Local Standby Daemons
               </p>
@@ -30,11 +30,13 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
 
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={triggerTrafficBurst}
             disabled={isSimulatingTraffic}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-600/30 text-xs font-semibold transition-all cursor-pointer"
+            aria-label={isSimulatingTraffic ? "Simulating network I/O packets" : "Simulate live distributed network I/O burst"}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/20 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-600/30 text-xs font-semibold transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-cyan-500"
           >
-            <Zap className={`w-4 h-4 ${isSimulatingTraffic ? 'animate-bounce text-cyan-400' : ''}`} />
+            <Zap className={`w-4 h-4 ${isSimulatingTraffic ? 'animate-bounce text-cyan-400' : ''}`} aria-hidden="true" />
             {isSimulatingTraffic ? 'Simulating I/O Packets...' : 'Simulate Live I/O Burst'}
           </button>
         </div>
@@ -46,7 +48,7 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
         <div className="flex flex-col items-center z-10">
           <div className="bg-[#0B0F17] px-6 py-4 rounded-2xl border border-cyan-500/40 shadow-xl shadow-cyan-950/40 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/30">
-              <Shield className="w-6 h-6" />
+              <Shield className="w-6 h-6" aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -63,7 +65,7 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
         </div>
 
         {/* Dynamic SVG Connection Cables with Animated Packets */}
-        <div className="w-full max-w-4xl h-24 relative my-1">
+        <div className="w-full max-w-4xl h-24 relative my-1" aria-hidden="true">
           <svg className="w-full h-full" viewBox="0 0 800 100" preserveAspectRatio="none">
             {/* 4 Connection Lines from Center (400, 0) to 4 Node Positions (100, 300, 500, 700) */}
             {[100, 300, 500, 700].map((x, idx) => (
@@ -127,7 +129,7 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
                           : 'bg-slate-800 border-slate-700 text-slate-400'
                       }`}
                     >
-                      {isAtlas ? <Cloud className="w-4 h-4" /> : <Server className="w-4 h-4" />}
+                      {isAtlas ? <Cloud className="w-4 h-4" aria-hidden="true" /> : <Server className="w-4 h-4" aria-hidden="true" />}
                     </div>
                     <div>
                       <h4 className="font-bold text-white text-xs uppercase font-mono m-0">{node.id}</h4>
@@ -180,6 +182,7 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
                         ? 'bg-emerald-400 animate-pulse'
                         : 'bg-amber-400'
                     }`}
+                    aria-hidden="true"
                   />
                   <span>{isOffline ? 'Node Unreachable' : isAtlas ? 'Serving Live Chunks' : 'Standby Emulation'}</span>
                 </div>
@@ -190,8 +193,12 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
 
         {/* Repair Flow Banner */}
         {activeRepair && (
-          <div className="mt-6 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2 text-xs text-amber-300 animate-pulse">
-            <Radio className="w-4 h-4 text-amber-400 animate-spin" />
+          <div 
+            role="status"
+            aria-live="polite"
+            className="mt-6 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2 text-xs text-amber-300 animate-pulse"
+          >
+            <Radio className="w-4 h-4 text-amber-400 animate-spin" aria-hidden="true" />
             <span>
               Active Data Transfer: Syncing <b>{activeRepair.object_name}</b> from{' '}
               <b>{activeRepair.source_node_id}</b> to <b>{activeRepair.target_node_id}</b> ({activeRepair.progress_percent}%)
@@ -199,6 +206,6 @@ export default function TopologyView({ nodes, stats, repairJobs }) {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }

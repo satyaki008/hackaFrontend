@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Filter, Trash2, CheckCircle2, AlertTriangle, AlertOctagon, Info } from 'lucide-react';
+import { Terminal, CheckCircle2, AlertTriangle, AlertOctagon, Info } from 'lucide-react';
 
 export default function ActivityLog({ events, onClearLog }) {
   const [selectedLevel, setSelectedLevel] = useState('ALL');
@@ -39,22 +39,26 @@ export default function ActivityLog({ events, onClearLog }) {
   };
 
   return (
-    <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
+    <section aria-labelledby="activity-log-heading" className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
       {/* Header & Filter Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Terminal className="w-5 h-5 text-cyan-400" />
-          <h2 className="text-base font-semibold text-white m-0">Cluster Activity & Audit Stream</h2>
+          <Terminal className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+          <h2 id="activity-log-heading" className="text-base font-semibold text-white m-0">Cluster Activity & Audit Stream</h2>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Level Filter Buttons */}
-          <div className="flex items-center rounded-lg bg-slate-900 border border-slate-800 p-0.5 text-[11px]">
+          <div role="tablist" aria-label="Log level filter" className="flex items-center rounded-lg bg-slate-900 border border-slate-800 p-0.5 text-[11px]">
             {['ALL', 'INFO', 'SUCCESS', 'WARNING', 'ERROR'].map((lvl) => (
               <button
                 key={lvl}
+                type="button"
+                role="tab"
+                aria-selected={selectedLevel === lvl}
+                aria-label={`Show ${lvl} level logs`}
                 onClick={() => setSelectedLevel(lvl)}
-                className={`px-2 py-1 rounded-md font-medium transition-colors ${
+                className={`px-2 py-1 rounded-md font-medium transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-500 ${
                   selectedLevel === lvl
                     ? 'bg-slate-800 text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
@@ -68,9 +72,15 @@ export default function ActivityLog({ events, onClearLog }) {
       </div>
 
       {/* Terminal Feed */}
-      <div className="bg-slate-950/90 rounded-xl border border-slate-800/80 p-3 h-72 overflow-y-auto font-mono text-xs space-y-2">
+      <div 
+        role="log"
+        aria-live="polite"
+        aria-label="Cluster event log feed"
+        tabIndex="0"
+        className="bg-slate-950/90 rounded-xl border border-slate-800/80 p-3 h-72 overflow-y-auto font-mono text-xs space-y-2 focus:outline-none focus:border-cyan-500/50"
+      >
         {filteredEvents.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-slate-400">
             No events recorded for selected level.
           </div>
         ) : (
@@ -84,7 +94,7 @@ export default function ActivityLog({ events, onClearLog }) {
                 className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-900/40 hover:bg-slate-900/80 transition-colors border border-transparent hover:border-slate-800/50"
               >
                 {/* Time */}
-                <span className="text-[11px] text-slate-500 whitespace-nowrap pt-0.5">
+                <span className="text-[11px] text-slate-400 whitespace-nowrap pt-0.5">
                   {new Date(e.timestamp).toLocaleTimeString()}
                 </span>
 
@@ -92,7 +102,7 @@ export default function ActivityLog({ events, onClearLog }) {
                 <span
                   className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border ${style.badge}`}
                 >
-                  <Icon className="w-3 h-3" />
+                  <Icon className="w-3 h-3" aria-hidden="true" />
                   {e.level}
                 </span>
 
@@ -110,6 +120,6 @@ export default function ActivityLog({ events, onClearLog }) {
           })
         )}
       </div>
-    </div>
+    </section>
   );
 }

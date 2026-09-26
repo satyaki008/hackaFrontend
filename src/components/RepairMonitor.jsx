@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wrench, CheckCircle2, AlertCircle, ArrowRight, Clock, RefreshCw } from 'lucide-react';
+import { Wrench, CheckCircle2, AlertCircle, ArrowRight, RefreshCw } from 'lucide-react';
 
 function formatBytes(bytes) {
   if (!bytes || bytes === 0) return '0 B';
@@ -11,12 +11,12 @@ function formatBytes(bytes) {
 
 export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
   return (
-    <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
+    <section aria-labelledby="repair-pipeline-heading" className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Wrench className="w-5 h-5 text-amber-400" />
+          <Wrench className="w-5 h-5 text-amber-400" aria-hidden="true" />
           <div>
-            <h2 className="text-base font-semibold text-white m-0">Autonomous Self-Healing Repair Pipeline</h2>
+            <h2 id="repair-pipeline-heading" className="text-base font-semibold text-white m-0">Autonomous Self-Healing Repair Pipeline</h2>
             <p className="text-xs text-slate-400 m-0">
               Automatic replica synthesis, peer data copying, and cryptographic checksum validation
             </p>
@@ -24,10 +24,12 @@ export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
         </div>
 
         <button
+          type="button"
           onClick={onTriggerRepairScan}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs font-medium transition-colors"
+          aria-label="Trigger autonomous cluster health audit and repair"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs font-medium transition-colors focus:outline-none focus:ring-1 focus:ring-amber-400"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
+          <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
           Trigger Health Audit
         </button>
       </div>
@@ -48,7 +50,7 @@ export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
           <tbody className="divide-y divide-slate-800/60 bg-slate-950/40">
             {(!repairJobs || repairJobs.length === 0) ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-slate-500">
+                <td colSpan={7} className="py-8 text-center text-slate-400">
                   No repair jobs recorded. All replicas are healthy and fully synchronized.
                 </td>
               </tr>
@@ -56,7 +58,6 @@ export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
               repairJobs.map((job) => {
                 const isDone = job.status === 'COMPLETED';
                 const isFailed = job.status === 'FAILED';
-                const isRunning = job.status === 'IN_PROGRESS';
 
                 return (
                   <tr key={job.id} className="hover:bg-slate-900/40 transition-colors">
@@ -71,7 +72,7 @@ export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
                         <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700">
                           {job.source_node_id || 'ANY'}
                         </span>
-                        <ArrowRight className="w-3 h-3 text-amber-400" />
+                        <ArrowRight className="w-3 h-3 text-amber-400" aria-hidden="true" />
                         <span className="px-1.5 py-0.5 rounded bg-cyan-950/50 border border-cyan-800/50 text-cyan-300">
                           {job.target_node_id}
                         </span>
@@ -79,20 +80,27 @@ export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
                     </td>
 
                     {/* Reason */}
-                    <td className="py-2.5 px-3 text-slate-400 font-mono text-[11px]">
+                    <td className="py-2.5 px-3 text-slate-300 font-mono text-[11px]">
                       {job.reason}
                     </td>
 
                     {/* Progress */}
                     <td className="py-2.5 px-3 w-36">
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                        <div 
+                          role="progressbar"
+                          aria-valuenow={job.progress_percent}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`Repair progress for ${job.object_name}: ${job.progress_percent}%`}
+                          className="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden"
+                        >
                           <div
-                            className={`h-1.5 rounded-full ${
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
                               isDone ? 'bg-emerald-400' : isFailed ? 'bg-rose-500' : 'bg-amber-400'
                             }`}
                             style={{ width: `${job.progress_percent}%` }}
-                          ></div>
+                          />
                         </div>
                         <span className="text-[10px] text-slate-400 font-mono w-7 text-right">
                           {job.progress_percent}%
@@ -116,14 +124,14 @@ export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
                             : 'bg-amber-500/10 text-amber-400 border-amber-500/30 animate-pulse'
                         }`}
                       >
-                        {isDone && <CheckCircle2 className="w-3 h-3" />}
-                        {isFailed && <AlertCircle className="w-3 h-3" />}
+                        {isDone && <CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
+                        {isFailed && <AlertCircle className="w-3 h-3" aria-hidden="true" />}
                         {job.status}
                       </span>
                     </td>
 
                     {/* Time */}
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-500 text-[11px]">
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-400 text-[11px]">
                       {new Date(job.started_at).toLocaleTimeString()}
                     </td>
                   </tr>
@@ -133,6 +141,6 @@ export default function RepairMonitor({ repairJobs, onTriggerRepairScan }) {
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   );
 }

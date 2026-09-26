@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, ShieldAlert, CheckCircle2, Download, Wrench, Sparkles, Upload, Binary, Cpu, RefreshCw, XCircle } from 'lucide-react';
+import { Layers, CheckCircle2, Download, Sparkles, Upload, Binary, Cpu } from 'lucide-react';
 import { api } from '../services/api';
 
 export default function ErasureCodingView({ onUploadComplete }) {
@@ -74,14 +74,14 @@ export default function ErasureCodingView({ onUploadComplete }) {
   return (
     <div className="space-y-6">
       {/* ── 1. REAL RS(4+2) ENCODING PIPELINE ── */}
-      <div className="bg-[#161B26] border border-[#1E2736] rounded-xl p-6 space-y-5">
+      <section aria-labelledby="rs-pipeline-heading" className="bg-[#161B26] border border-[#1E2736] rounded-xl p-6 space-y-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-              <Layers className="w-6 h-6" />
+              <Layers className="w-6 h-6" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white m-0">
+              <h2 id="rs-pipeline-heading" className="text-base font-bold text-white m-0">
                 Reed-Solomon RS(4+2) Erasure Coding Engine
               </h2>
               <p className="text-xs text-slate-400 m-0">
@@ -96,14 +96,15 @@ export default function ErasureCodingView({ onUploadComplete }) {
           <input
             type="file"
             id="erasure-file-picker"
+            aria-label="Choose file to encode with RS(4+2)"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="hidden"
           />
           <label
             htmlFor="erasure-file-picker"
-            className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg bg-[#161B26] border border-[#1E2736] hover:border-slate-600 text-xs font-medium text-slate-200 transition-colors"
+            className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg bg-[#161B26] border border-[#1E2736] hover:border-slate-600 text-xs font-medium text-slate-200 transition-colors focus-within:ring-2 focus-within:ring-cyan-500"
           >
-            <Upload className="w-4 h-4 text-cyan-400" />
+            <Upload className="w-4 h-4 text-cyan-400" aria-hidden="true" />
             {file ? file.name : 'Choose File to Encode with RS(4+2)'}
           </label>
 
@@ -116,15 +117,16 @@ export default function ErasureCodingView({ onUploadComplete }) {
           <button
             type="submit"
             disabled={!file || uploading}
-            className="ml-auto flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-cyan-950/50 transition-all disabled:opacity-50 cursor-pointer"
+            aria-label={uploading ? "Dispersing shards across storage nodes" : "Encode file and disperse shards"}
+            className="ml-auto flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-cyan-950/50 transition-all disabled:opacity-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" aria-hidden="true" />
             {uploading ? 'Dispersing Shards...' : 'Encode & Disperse Shards'}
           </button>
         </form>
 
         {error && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+          <div role="alert" className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
             {error}
           </div>
         )}
@@ -134,14 +136,16 @@ export default function ErasureCodingView({ onUploadComplete }) {
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-white flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" aria-hidden="true" />
                 Object Encoded: {result.name} ({result.size_bytes} bytes)
               </span>
               <button
+                type="button"
                 onClick={() => handleDownload(result.object_id, result.name)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 text-xs hover:bg-emerald-600/30 cursor-pointer"
+                aria-label={`Decode and download original ${result.name}`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 text-xs hover:bg-emerald-600/30 cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-400"
               >
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-3.5 h-3.5" aria-hidden="true" />
                 Decode & Download Original
               </button>
             </div>
@@ -165,7 +169,7 @@ export default function ErasureCodingView({ onUploadComplete }) {
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-300 m-0">Target: {s.node_id}</p>
-                  <p className="text-[10px] text-slate-500 m-0 truncate" title={s.checksum}>
+                  <p className="text-[10px] text-slate-400 m-0 truncate" title={s.checksum}>
                     {s.checksum.slice(0, 8)}...
                   </p>
                 </div>
@@ -173,17 +177,17 @@ export default function ErasureCodingView({ onUploadComplete }) {
             </div>
           </div>
         )}
-      </div>
+      </section>
 
       {/* ── 2. INTERACTIVE CAUCHY GF(2^8) SHARD LOSS & RECONSTRUCTION SIMULATOR ── */}
-      <div className="bg-[#161B26] border border-[#1E2736] rounded-xl p-6 space-y-5">
+      <section aria-labelledby="cauchy-simulator-heading" className="bg-[#161B26] border border-[#1E2736] rounded-xl p-6 space-y-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-              <Binary className="w-6 h-6" />
+              <Binary className="w-6 h-6" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white m-0">
+              <h3 id="cauchy-simulator-heading" className="text-base font-bold text-white m-0">
                 Interactive Cauchy Matrix Shard Loss & Solver Simulator
               </h3>
               <p className="text-xs text-slate-400 m-0">
@@ -193,21 +197,24 @@ export default function ErasureCodingView({ onUploadComplete }) {
           </div>
 
           <button
+            type="button"
             onClick={handleSimulateRecovery}
             disabled={simRunning}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-950/50 transition-all disabled:opacity-50 cursor-pointer"
+            aria-label={simRunning ? "Inverting Cauchy matrix and solving equations" : "Solve Cauchy matrix and reconstruct payload"}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-950/50 transition-all disabled:opacity-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400"
           >
-            <Cpu className="w-4 h-4" />
+            <Cpu className="w-4 h-4" aria-hidden="true" />
             {simRunning ? 'Inverting Cauchy Matrix...' : 'Solve Cauchy Matrix & Reconstruct'}
           </button>
         </div>
 
         {/* Test Payload Input */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">
+          <label htmlFor="test-payload-input" className="block text-xs font-medium text-slate-400 mb-1">
             Test Payload String:
           </label>
           <input
+            id="test-payload-input"
             type="text"
             value={testMessage}
             onChange={(e) => setTestMessage(e.target.value)}
@@ -225,10 +232,13 @@ export default function ErasureCodingView({ onUploadComplete }) {
               const isDestroyed = destroyedShards.includes(idx);
               const isData = idx < 4;
               return (
-                <div
+                <button
+                  type="button"
                   key={idx}
                   onClick={() => toggleShardDestroy(idx)}
-                  className={`p-4 rounded-xl border text-center cursor-pointer transition-all duration-300 relative select-none ${
+                  aria-pressed={isDestroyed}
+                  aria-label={`${lbl}: ${isDestroyed ? 'Destroyed. Click to mark as surviving.' : 'Surviving. Click to simulate shard loss.'}`}
+                  className={`p-4 rounded-xl border text-center cursor-pointer transition-all duration-300 relative select-none focus:outline-none focus:ring-2 focus:ring-purple-400 ${
                     isDestroyed
                       ? 'bg-rose-950/20 border-rose-500/50 text-rose-300'
                       : isData
@@ -248,7 +258,7 @@ export default function ErasureCodingView({ onUploadComplete }) {
                       {isDestroyed ? 'DESTROYED ✗' : 'SURVIVING ✓'}
                     </span>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -256,9 +266,13 @@ export default function ErasureCodingView({ onUploadComplete }) {
 
         {/* Simulation Output */}
         {simResult && (
-          <div className="bg-[#0B0F17] border border-emerald-500/30 rounded-xl p-4 space-y-2">
+          <div 
+            role="status"
+            aria-live="polite"
+            className="bg-[#0B0F17] border border-emerald-500/30 rounded-xl p-4 space-y-2"
+          >
             <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
               {simResult.verdict}
             </div>
             <p className="text-xs text-slate-300 font-mono m-0">
@@ -269,7 +283,7 @@ export default function ErasureCodingView({ onUploadComplete }) {
             </div>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

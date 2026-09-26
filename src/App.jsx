@@ -193,18 +193,22 @@ export default function App() {
         }}
       />
 
-      {/* ── Main Content ── */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      {/* ── Main Content Container ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* ── Top Bar ── */}
-        <header className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-[#1E2736]">
+        <header role="banner" className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-[#1E2736] bg-[#0B0F17]/90 backdrop-blur">
           <div className="flex items-center gap-4">
             <div>
-              <p className="text-[11px] text-slate-500 mb-0.5 font-mono">System Control</p>
+              <p className="text-[11px] text-slate-400 mb-0.5 font-mono">System Control</p>
               <h1 className="text-lg font-semibold text-white leading-tight">{PAGE_TITLES[activeSection]}</h1>
             </div>
             {/* Status pill */}
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${badge.color}`}>
-              <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
+            <div 
+              role="status"
+              aria-label={`Cluster status: ${badge.text}`}
+              className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${badge.color}`}
+            >
+              <span className={`w-2 h-2 rounded-full ${badge.dot}`} aria-hidden="true" />
               {badge.text}
             </div>
           </div>
@@ -212,60 +216,81 @@ export default function App() {
           <div className="flex items-center gap-3">
             {/* Live sync toggle */}
             <button
+              type="button"
               onClick={() => setIsLiveSync(!isLiveSync)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+              aria-label={isLiveSync ? "Pause real-time data sync" : "Resume real-time data sync"}
+              aria-pressed={isLiveSync}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
                 isLiveSync
                   ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
                   : 'bg-[#161B26] border-[#1E2736] text-slate-400 hover:text-white'
               }`}
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLiveSync ? 'animate-spin' : ''}`} style={{ animationDuration: '3s' }} />
+              <RefreshCw 
+                aria-hidden="true"
+                className={`w-3.5 h-3.5 ${isLiveSync ? 'animate-spin' : ''}`} 
+                style={{ animationDuration: '3s' }} 
+              />
               {isLiveSync ? 'Live' : 'Paused'}
             </button>
 
-            <div className="h-5 w-px bg-[#1E2736]" />
+            <div className="h-5 w-px bg-[#1E2736]" aria-hidden="true" />
 
             {/* Judge Interactive Walkthrough Button */}
             <button
+              type="button"
               onClick={handleRunAutoRepairDemo}
               disabled={isDemoRunning}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 shadow-md shadow-cyan-950/50 transition-all border border-cyan-400/30 cursor-pointer disabled:opacity-50"
+              aria-label="Launch 30-second live self-healing evaluation demo"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 shadow-md shadow-cyan-950/50 transition-all border border-cyan-400/30 cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cyan-400"
             >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-200 animate-spin" style={{ animationDuration: '4s' }} />
+              <Sparkles aria-hidden="true" className="w-3.5 h-3.5 text-cyan-200 animate-spin" style={{ animationDuration: '4s' }} />
               Judge Live Demo (30s)
             </button>
 
             {/* Action buttons */}
             <button
+              type="button"
               onClick={handleRunAutoRepairDemo}
               disabled={isDemoRunning}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50"
+              aria-label="Simulate storage node crash and trigger autonomous repair"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-rose-500"
             >
-              <AlertTriangle className="w-3.5 h-3.5" />
+              <AlertTriangle aria-hidden="true" className="w-3.5 h-3.5" />
               Simulate Failure
             </button>
 
             <button
+              type="button"
               onClick={handleRunCorruptionDemo}
               disabled={isDemoRunning}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-colors disabled:opacity-50"
+              aria-label="Simulate disk byte corruption and test peer self-healing"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-amber-500"
             >
-              <ShieldAlert className="w-3.5 h-3.5" />
+              <ShieldAlert aria-hidden="true" className="w-3.5 h-3.5" />
               Simulate Corruption
             </button>
 
             <button
+              type="button"
               onClick={handleResetCluster}
-              className="p-1.5 rounded-lg bg-[#161B26] border border-[#1E2736] text-slate-400 hover:text-white hover:border-slate-600 transition-colors"
+              className="p-1.5 rounded-lg bg-[#161B26] border border-[#1E2736] text-slate-400 hover:text-white hover:border-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
               title="Reset Cluster"
+              aria-label="Reset cluster and recover all nodes to online"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         </header>
 
-        {/* ── Content Area ── */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* ── Main Landmark Content Area ── */}
+        <main 
+          id="main-content" 
+          role="main" 
+          tabIndex="-1" 
+          aria-label={PAGE_TITLES[activeSection]} 
+          className="flex-1 overflow-y-auto p-6 focus:outline-none"
+        >
           <div className="max-w-[1400px] mx-auto space-y-6">
             {activeSection === 'overview' && (
               <>
@@ -331,8 +356,8 @@ export default function App() {
               <ActivityLog events={events} onClearLog={() => setEvents([])} />
             )}
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
       {/* ── Demo Modal ── */}
       <DemoModal

@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { 
   Terminal, 
-  ShieldCheck, 
   Zap, 
-  Activity, 
   CheckCircle2, 
-  AlertTriangle, 
-  Check, 
-  Upload, 
-  Lock, 
-  Flame, 
-  Cpu,
-  ArrowRight
+  Upload
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -61,16 +53,16 @@ export default function OverviewActivityConsole({ events = [], onRefresh }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* ── LEFT: LIVE STREAM TERMINAL ── */}
-      <div className="lg:col-span-7 bg-[#161B26] border border-[#1E2736] rounded-xl p-5 flex flex-col justify-between space-y-4">
+      <section aria-labelledby="live-stream-heading" className="lg:col-span-7 bg-[#161B26] border border-[#1E2736] rounded-xl p-5 flex flex-col justify-between space-y-4">
         <div className="flex items-center justify-between border-b border-[#1E2736] pb-3">
           <div className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono m-0">
+            <Terminal className="w-4 h-4 text-cyan-400" aria-hidden="true" />
+            <h3 id="live-stream-heading" className="text-xs font-bold text-white uppercase tracking-wider font-mono m-0">
               Live Cluster Event Stream & Audit Trail
             </h3>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
             <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
               STREAM ACTIVE
             </span>
@@ -78,7 +70,13 @@ export default function OverviewActivityConsole({ events = [], onRefresh }) {
         </div>
 
         {/* Event List */}
-        <div className="space-y-2 flex-1 overflow-hidden font-mono text-xs">
+        <div 
+          role="log"
+          aria-live="polite"
+          aria-label="Live event stream"
+          tabIndex="0"
+          className="space-y-2 flex-1 overflow-hidden font-mono text-xs focus:outline-none"
+        >
           {recentEvents.length > 0 ? (
             recentEvents.map((e, idx) => (
               <div 
@@ -93,33 +91,33 @@ export default function OverviewActivityConsole({ events = [], onRefresh }) {
                     {e.message}
                   </p>
                 </div>
-                <span className="text-[10px] text-slate-500 shrink-0">
+                <span className="text-[10px] text-slate-400 shrink-0">
                   {new Date(e.timestamp).toLocaleTimeString()}
                 </span>
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-slate-500 text-xs">
+            <div className="text-center py-8 text-slate-400 text-xs">
               No recent events logged. Stream initialized.
             </div>
           )}
         </div>
 
         {/* Footer info */}
-        <div className="pt-2 border-t border-[#1E2736] flex justify-between items-center text-[10px] font-mono text-slate-500">
+        <div className="pt-2 border-t border-[#1E2736] flex justify-between items-center text-[10px] font-mono text-slate-400">
           <span>Continuous SHA-256 Merkle Verification</span>
           <span>Buffer: {recentEvents.length} events displayed</span>
         </div>
-      </div>
+      </section>
 
       {/* ── RIGHT: COCKPIT QUICK TEST & SLA GAUGE ── */}
-      <div className="lg:col-span-5 space-y-4">
+      <section aria-labelledby="cockpit-heading" className="lg:col-span-5 space-y-4">
         {/* Cockpit Card */}
         <div className="bg-[#161B26] border border-[#1E2736] rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between border-b border-[#1E2736] pb-3">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono m-0">
+              <Zap className="w-4 h-4 text-cyan-400" aria-hidden="true" />
+              <h3 id="cockpit-heading" className="text-xs font-bold text-white uppercase tracking-wider font-mono m-0">
                 Interactive Cluster Cockpit
               </h3>
             </div>
@@ -133,25 +131,31 @@ export default function OverviewActivityConsole({ events = [], onRefresh }) {
           </p>
 
           <button
+            type="button"
             onClick={handleQuickWrite}
             disabled={isQuickWriting}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold font-mono shadow-lg shadow-cyan-950/50 transition-all disabled:opacity-50 cursor-pointer"
+            aria-label={isQuickWriting ? "Writing test object across quorum blades" : "Execute 1-click test quorum write"}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold font-mono shadow-lg shadow-cyan-950/50 transition-all disabled:opacity-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400"
           >
-            <Upload size={14} className={isQuickWriting ? 'animate-bounce' : ''} />
+            <Upload size={14} className={isQuickWriting ? 'animate-bounce' : ''} aria-hidden="true" />
             {isQuickWriting ? 'Writing to Quorum Blades...' : '⚡ Instant 1-Click Quorum Write'}
           </button>
 
           {/* Quick Write Result Banner */}
           {quickWriteResult && (
-            <div className={`p-3 rounded-lg border text-xs font-mono space-y-1 ${
-              quickWriteResult.success 
-                ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300' 
-                : 'bg-rose-950/20 border-rose-500/40 text-rose-300'
-            }`}>
+            <div 
+              role="status"
+              aria-live="polite"
+              className={`p-3 rounded-lg border text-xs font-mono space-y-1 ${
+                quickWriteResult.success 
+                  ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300' 
+                  : 'bg-rose-950/20 border-rose-500/40 text-rose-300'
+              }`}
+            >
               {quickWriteResult.success ? (
                 <>
                   <div className="flex items-center gap-1.5 font-bold">
-                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    <CheckCircle2 size={14} className="text-emerald-400" aria-hidden="true" />
                     Quorum Consensus Written!
                   </div>
                   <div className="text-[11px] text-slate-300">
@@ -170,19 +174,19 @@ export default function OverviewActivityConsole({ events = [], onRefresh }) {
           {/* SLA & Durability Indicators */}
           <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#1E2736]">
             <div className="p-2.5 rounded-lg bg-[#0B0F17] border border-[#1E2736]">
-              <span className="text-[10px] font-mono text-slate-500 uppercase block">Cluster Durability</span>
+              <span className="text-[10px] font-mono text-slate-400 uppercase block">Cluster Durability</span>
               <span className="text-sm font-bold font-mono text-emerald-400">99.999%</span>
-              <span className="text-[9px] text-slate-500 block">Tolerates 2 Dead Nodes</span>
+              <span className="text-[9px] text-slate-400 block">Tolerates 2 Dead Nodes</span>
             </div>
 
             <div className="p-2.5 rounded-lg bg-[#0B0F17] border border-[#1E2736]">
-              <span className="text-[10px] font-mono text-slate-500 uppercase block">Quorum Policy</span>
+              <span className="text-[10px] font-mono text-slate-400 uppercase block">Quorum Policy</span>
               <span className="text-sm font-bold font-mono text-cyan-400">W &ge; 2 &bull; R &ge; 2</span>
-              <span className="text-[9px] text-slate-500 block">Strong Consistency</span>
+              <span className="text-[9px] text-slate-400 block">Strong Consistency</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

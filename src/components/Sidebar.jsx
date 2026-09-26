@@ -35,7 +35,9 @@ export default function Sidebar({
     systemStatus === 'critical' ? 'bg-red-500' : 'bg-gray-500';
 
   return (
-    <div 
+    <aside 
+      role="navigation"
+      aria-label="Main Navigation"
       className={`
         flex flex-col h-full bg-[#0D1117] border-r border-[#1E2736] 
         transition-all duration-300 ease-in-out shrink-0
@@ -44,21 +46,21 @@ export default function Sidebar({
     >
       {/* Header */}
       <div className="flex items-center h-16 px-4 border-b border-[#1E2736] shrink-0">
-        <div className="flex items-center justify-center min-w-[32px] h-8 text-cyan-400">
+        <div className="flex items-center justify-center min-w-[32px] h-8 text-cyan-400" aria-hidden="true">
           <Shield size={24} />
         </div>
         {!isCollapsed && (
           <div className="flex items-center ml-3 overflow-hidden whitespace-nowrap">
             <span className="text-white font-semibold text-lg tracking-wide">ResiStore</span>
             <span className="ml-2 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-400/10 rounded">
-              v1.0
+              v2.0
             </span>
           </div>
         )}
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar">
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar" aria-label="Dashboard sections">
         {navItems.map((item) => {
           const isActive = activeSection === item.id;
           const Icon = item.icon;
@@ -66,24 +68,28 @@ export default function Sidebar({
           return (
             <button
               key={item.id}
+              type="button"
               onClick={() => onSectionChange?.(item.id)}
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
               title={isCollapsed ? item.label : undefined}
               className={`
-                w-full flex items-center h-10 rounded-lg group transition-colors relative
+                w-full flex items-center h-10 rounded-lg group transition-colors relative focus:outline-none focus:ring-2 focus:ring-cyan-500
                 ${isCollapsed ? 'justify-center px-0' : 'px-3'}
                 ${isActive 
-                  ? 'bg-[#1E2736] text-cyan-400' 
-                  : 'text-gray-400 hover:text-gray-200 hover:bg-[#1E2736]/50'
+                  ? 'bg-[#1E2736] text-cyan-400 font-semibold' 
+                  : 'text-gray-300 hover:text-white hover:bg-[#1E2736]/50'
                 }
               `}
             >
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full" aria-hidden="true" />
               )}
               
               <Icon 
                 size={20} 
-                className={`shrink-0 ${isActive ? 'text-cyan-400' : 'text-gray-400 group-hover:text-gray-300'}`} 
+                aria-hidden="true"
+                className={`shrink-0 ${isActive ? 'text-cyan-400' : 'text-gray-400 group-hover:text-gray-200'}`} 
               />
               
               {!isCollapsed && (
@@ -92,59 +98,74 @@ export default function Sidebar({
                     {item.label}
                   </span>
                   {item.badge > 0 && (
-                    <span className="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-400/10 text-cyan-400">
+                    <span 
+                      aria-label={`${item.badge} notifications for ${item.label}`}
+                      className="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-400/10 text-cyan-400"
+                    >
                       {item.badge > 99 ? '99+' : item.badge}
                     </span>
                   )}
                 </>
               )}
               {isCollapsed && item.badge > 0 && (
-                <div className="absolute top-1 right-1 w-2.5 h-2.5 bg-cyan-400 rounded-full border-2 border-[#0D1117]" />
+                <div 
+                  aria-hidden="true"
+                  className="absolute top-1 right-1 w-2.5 h-2.5 bg-cyan-400 rounded-full border-2 border-[#0D1117]" 
+                />
               )}
             </button>
           );
         })}
-      </div>
+      </nav>
 
       {/* Footer / Status */}
       <div className="shrink-0 border-t border-[#1E2736] p-3">
         {!isCollapsed ? (
-          <div className="mb-3 px-3 py-2 rounded-lg bg-[#161B26] border border-[#1E2736] flex items-center justify-between">
+          <div 
+            role="status"
+            aria-live="polite"
+            className="mb-3 px-3 py-2 rounded-lg bg-[#161B26] border border-[#1E2736] flex items-center justify-between"
+          >
             <div className="flex items-center space-x-2">
-              <Server size={14} className="text-gray-400" />
+              <Server size={14} className="text-gray-400" aria-hidden="true" />
               <span className="text-xs text-gray-300">
-                {healthyNodes}/{totalNodes} Nodes
+                {healthyNodes}/{totalNodes} Nodes Online
               </span>
             </div>
-            <div className={`w-2 h-2 rounded-full ${statusColor} shadow-[0_0_8px_currentColor]`} />
+            <div className={`w-2 h-2 rounded-full ${statusColor} shadow-[0_0_8px_currentColor]`} aria-hidden="true" />
           </div>
         ) : (
           <div 
             className="mb-3 flex justify-center py-2"
             title={`${healthyNodes}/${totalNodes} Nodes Online`}
+            role="status"
+            aria-label={`${healthyNodes} of ${totalNodes} storage nodes online`}
           >
-            <div className={`w-2.5 h-2.5 rounded-full ${statusColor} shadow-[0_0_8px_currentColor]`} />
+            <div className={`w-2.5 h-2.5 rounded-full ${statusColor} shadow-[0_0_8px_currentColor]`} aria-hidden="true" />
           </div>
         )}
 
         <button
+          type="button"
           onClick={onToggleCollapse}
+          aria-label={isCollapsed ? "Expand sidebar navigation" : "Collapse sidebar navigation"}
+          aria-expanded={!isCollapsed}
           className={`
-            w-full flex items-center h-10 rounded-lg text-gray-400 hover:text-white hover:bg-[#1E2736]/50 transition-colors
+            w-full flex items-center h-10 rounded-lg text-gray-400 hover:text-white hover:bg-[#1E2736]/50 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500
             ${isCollapsed ? 'justify-center' : 'px-3'}
           `}
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? (
-            <ChevronRight size={20} />
+            <ChevronRight size={20} aria-hidden="true" />
           ) : (
             <>
-              <ChevronLeft size={20} className="shrink-0" />
+              <ChevronLeft size={20} className="shrink-0" aria-hidden="true" />
               <span className="ml-3 text-sm font-medium">Collapse</span>
             </>
           )}
         </button>
       </div>
-    </div>
+    </aside>
   );
 }
